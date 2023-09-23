@@ -1,0 +1,303 @@
+¬¬¬
+
+
+	There are several resources available for learning Snowflake SQL:
+1.	Snowflake's own documentation: Snowflake provides extensive documentation on their website, including tutorials, guides, and reference materials on how to use Snowflake SQL. You can find the documentation at https://docs.snowflake.com/en/sql-reference/index.html
+2.	Snowflake's YouTube channel: Snowflake's YouTube channel has a variety of video tutorials that cover different aspects of using Snowflake SQL, including how to create tables, load data, and write queries.
+3.	Snowflake University: Snowflake University offers a variety of free and paid training courses on Snowflake SQL and other Snowflake features, including self-paced, instructor-led, and virtual labs.
+4.	Snowflake Community: Snowflake has an active community of users and developers who share their knowledge and experience. The community forum is a good place to get answers to your questions and learn from others.
+5.	Online tutorials and courses: There are also many online tutorials and courses that cover Snowflake SQL, such as Udemy, Coursera, and edX, that you can use to learn at your own pace.
+It's important to note that Snowflake SQL is built on top of standard ANSI SQL, so having a solid understanding of SQL will make the learning process easier.
+
+SELECT name, address, points, points * 1000
+FROM customers;
+
+
+SELECT *
+FROM customers
+WHERE state != 'va';
+
+Is same as
+
+SELECT *
+FROM customers
+WHERE state <> 'va';
+
+-	In the SQL language we should always use dates in quotations
+
+
+SELECT *
+FROM customers
+WHERE birth_date > '1990-01-01' OR points > 1000;
+
+AND operator has a higher preference than the OR operator
+
+
+SELECT *
+FROM order_items
+WHERE order_id = 6 AND quantity * unit_price > 30;
+
+
+SELECT * 
+FROM customers
+WHERE state IN ('VA', 'FL', 'GA');
+
+SELECT * 
+FROM customers
+WHERE state NOT IN ('VA', 'FL', 'GA');
+
+
+SELECT * 
+FROM customers
+WHERE NOT (birth_date > '1990-01-01' OR points > 1000);
+-- is same as
+SELECT * 
+FROM customers 
+WHERE birth_date <= '1990-01-01' AND points > 1000;
+
+SELECT *
+FROM customers
+WHERE birth_date BETWEEN '1990-01-01' AND '2000-01-01';
+
+SELECT * 
+FROM customers
+WHERE last_name LIKE 'b%';
+
+
+
+
+SELECT * 
+FROM customers
+WHERE last_name LIKE '_____y';
+
+-- % any number of characters
+-- _ a single character
+
+
+SELECT *
+FROM customers
+WHERE address LIKE '%trail%' OR address LIKE '%avenue%';
+
+SELECT * 
+FROM customers 
+WHERE phone LIKE '%9';
+
+SELECT *
+FROM customers
+WHERE last_name REGEXP 'field';
+
+SELECT *
+FROM customers
+WHERE last_name REGEXP 'field|mac';
+
+SELECT *
+FROM customers
+WHERE last_name REGEXP 'field$|mac|rose';
+
+SELECT *
+FROM customers
+WHERE last_name REGEXP '^brush|mac|rose';
+
+
+
+
+
+SELECT *
+FROM customers
+WHERE last_name REGEXP '^brush|frey$|rose';
+
+-- ^ The ^ symbol at the beginning of a condition indicates a last_name beginning with brush
+-- | The pipe/vertical bar separates each condition
+-- $ The $ symbol at the end of a condition indicates a last_name ending in frey
+
+
+SELECT *
+FROM customers
+WHERE last_name REGEXP '[gim]e'
+
+
+-- This selects all customers who's last name either has the letter, g, i or me followed by the letter e
+
+ge
+ie 
+me 
+
+
+
+SELECT *
+FROM customers
+WHERE last_name REGEXP '[qrs]e';
+qe
+re
+se
+
+
+
+SELECT *
+FROM customers
+WHERE last_name REGEXP '[a-d]e';
+
+-- This will put all results with last names that begin either with 
+-- an a,b,c or d followed by an e
+
+SELECT * 
+FROM customers
+WHERE phone IS NULL;
+
+SELECT *
+FROM customers
+ORDER BY state DESC, first_name DESC;
+
+
+SELECT *, quantity * unit_price AS total_price
+FROM order_items
+WHERE order_id = 2
+ORDER BY total_price DESC;
+
+SELECT *
+FROM customers
+LIMIT 5;
+
+SELECT *
+FROM customers
+LIMIT 6, 3
+-- page 1: 1 - 3
+-- page 2: 4 - 6
+-- page 3: 7 - 9
+-- 6 is what is known as an offset. This query skips the first 6 records and pulls the next 3
+
+SELECT *
+FROM customers
+ORDER BY points DESC
+LIMIT 3;
+
+SELECT *
+FROM orders
+JOIN customers
+         ON orders.customer_id = customers.customer_id;
+
+
+
+USE sql_hr;
+
+SELECT e.employee_id,e.first_name, m.first_name AS Mangaer
+FROM employees e
+JOIN employees m
+       ON e.reports_to = m.employee_id;
+
+
+SELECT * 
+FROM orders o
+JOIN customers c
+       ON o.customer_id = c.customer_id
+JOIN order_statuses os
+       ON o.status = os.order_status_id;
+
+SELECT 
+	p.date,
+	c.name, 
+    p.invoice_id,
+	p.amount AS 'Total Spent', 
+	pm.name AS 'Payment Type'
+FROM payments p
+JOIN payment_methods pm
+	ON p.payment_method = pm.payment_method_id
+JOIN clients c
+	ON p.client_id = c.client_id;
+    
+
+
+When primary keys exist on 2 columns this is called a Composite Primary Key. 
+A composite Primary Key contains more than 1 column.
+
+
+SELECT *
+FROM order_items oi
+JOIN order_item_notes oin
+	ON oi.order_id = oin.order_id -- Compound Join Condition
+AND	oi.product_id = oin.product_id; -- Compount Join
+Condition
+
+/*SELECT *
+FROM orders o --
+JOIN customers c --
+	ON o.customer_id = c.customer_id;*/
+
+
+Same as above ^
+ -- IMPLICIT JOIN SYTNAX   
+SELECT *
+FROM orders o, customers c
+WHERE o.customer_id = c.customer_id;
+
+
+
+
+
+
+Joining a table on itself
+Joining a employee list table onto itself to see who each employee reports to
+
+SELECT *
+FROM employees e
+JOIN employees m
+      ON e.reports_to = m.employee_id;
+
+SELECT e.employee_id, 
+              e.first_name,
+              m.first_name
+FROM employees e
+JOIN employees m
+         ON e.reports_to = m.employee_id;
+
+
+SELECT 
+    o.order_id,    
+    o.order_date,
+    c.first_name,
+    c.last_name,
+    os.name AS status
+FROM orders o
+JOIN customers c
+     ON o.customer_id = c.customer_id
+JOIN order_statuses os
+     ON o.status = os.order_status_id;
+
+
+SELECT *
+FROM order_items oi
+JOIN order_item_notes oin
+/* Compound Join Condition*/
+     ON oi.order_id = oin.order_id
+     AND oi.product_id = oin.product_id
+
+
+/* join payments table with clients table as well as payment_methods
+ name of client, payment method */
+ 
+ SELECT 
+    c.client_id,
+    c.name,
+    c.address,
+    c.city,
+    c.state,
+    c.phone,
+    p.amount,
+    pm.name AS 'payment method'
+ FROM payments p
+ JOIN clients c
+     ON p.client_id = c.client_id
+JOIN payment_methods pm
+     ON p.payment_method = pm.payment_method_id;
+ 
+/* LEFT JOIN - ALL RECORDS FROM THE LEFT TABLE WILL BE           RETURNED WHETHER THE CONDITION IS TRUE OR NOT. SO WE WILL GET ALL THE CUSTOMERS AND IF THEY HAVE AN ORDER, WE'LL
+   SEE THE order_id as well*/
+
+SELECT 
+    c.customer_id,
+    c.first_name,
+    o.order_id
+FROM customers c
+LEFT JOIN orders o
+     ON c.customer_id = o.customer_id
+ORDER BY c.customer_id;
