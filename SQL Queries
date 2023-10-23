@@ -14,7 +14,7 @@ FROM customers;
 
 
 SELECT *
-FROM customers
+FROM customers   
 WHERE state != 'va';
 
 Is same as
@@ -327,3 +327,19 @@ LEFT JOIN shippers sh
 	USING (shipper_id);
 
 -- You can use the inner keyword with both inner and outer joins
+-- The using Keyword only works if the column name is exactly the same across different tables --
+
+What if we have multiple joins in our joint condition?
+The using keyword only works if the column name is exactly the same across different tables.
+
+What if we have multiple conditions in our joint condition?
+For example, in the order_items table, there is a composite primary key
+that consists of multiple columns. So the combination of these two columns 
+will uniquely identify these two tables. Now if you want to join this table 
+with order_items table
+
+
+
+
+
+
